@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>个人信息</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <link href="/favicon.ico" rel="icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet"/>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style-da.css" rel="stylesheet">
+</head>
+
+<body>
+<div class="container-fluid position-relative bg-white d-flex p-0">
+    <!-- 侧边栏 -->
+    <div class="sidebar pe-4 pb-3">
+        <nav class="navbar bg-light navbar-light">
+            <a href="" id="profileLink" class="navbar-brand mx-4 mb-3">
+                <h3 class="text-primary">个人信息</h3>
+            </a>
+        </nav>
+    </div>
+
+    <!-- 内容区域 -->
+    <div class="content">
+        <!-- 导航栏 -->
+        <nav class="navbar navbar-expand bg-light navbar-light sticky-top px-4 py-0">
+            <a href="#" class="sidebar-toggler flex-shrink-0">
+                <i class="fa fa-bars"></i>
+            </a>
+        </nav>
+
+        <!-- 用户信息 -->
+        <div class="container-fluid pt-4 px-4">
+            <div class="bg-light rounded p-4">
+                <div class="row mb-3">
+                    <div class="col-12 d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">个人信息</h4>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal">
+                            <i class="fa fa-edit me-2"></i>修改
+                        </button>
+                    </div>
+                    
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">用户名</label>
+                            <div class="form-control" th:text="${user.username}"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">真实姓名</label>
+                            <div class="form-control" th:text="${user.realName}"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">角色</label>
+                            <div class="form-control" th:text="${user.role}"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">邮箱</label>
+                            <div class="form-control" th:text="${user.email}"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">电话号码</label>
+                            <div class="form-control" th:text="${user.phone}"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">状态</label>
+                            <div class="form-control" th:text="${user.status == '1' ? '正常' : '已禁用'}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <div class="container-fluid pt-4 px-4">
+            <div class="bg-light rounded-top p-4">
+                <div class="row">
+                    <div class="col-12 col-sm-6 text-center text-sm-start">
+                        &copy; <a href="#">毕业设计学生选题系统</a>, All Right Reserved.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">修改个人信息</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">用户名</label>
+                                <input type="text" class="form-control" id="username" th:value="${user.username}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="realName" class="form-label">真实姓名</label>
+                                <input type="text" class="form-control" id="realName" th:value="${user.realName}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">邮箱</label>
+                                <input type="email" class="form-control" id="email" th:value="${user.email}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">电话号码</label>
+                                <input type="tel" class="form-control" id="phone" th:value="${user.phone}">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="saveChangesBtn" onclick="saveUserInfo()">保存修改</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// 根据角色设置个人信息链接
+(function() {
+    const role = '[[${user.role}]]';
+    const profileLink = document.getElementById('profileLink');
+    
+    switch(role) {
+        case 'TEACHER':
+            profileLink.href = '/teacher/dashboard';
+            break;
+        case 'STUDENT':
+            profileLink.href = '/student/dashboard';
+            break;
+        case 'ADMIN':
+            profileLink.href = '/admin/dashboard';
+            break;
+        default:
+            profileLink.href = '/';
+    }
+})();
+
+function saveUserInfo() {
+    const userData = {
+        username: document.getElementById('username').value,
+        realName: document.getElementById('realName').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value
+    };
+
+    fetch('/user/updateSelfInfo', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify(userData),
+        credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('保存成功');
+            location.reload();
+        } else {
+            alert('保存失败: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('保存失败，请稍后重试');
+    });
+}
+</script>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/lib/chart/chart.min.js"></script>
+<script src="/lib/easing/easing.min.js"></script>
+<script src="/lib/waypoints/waypoints.min.js"></script>
+<script src="/lib/owlcarousel/owl.carousel.min.js"></script>
+<script src="/lib/tempusdominus/js/moment.min.js"></script>
+<script src="/lib/tempusdominus/js/moment-timezone.min.js"></script>
+<script src="/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+
+<!-- Template Javascript -->
+<script src="/js/main.js"></script>
+</body>
+</html>

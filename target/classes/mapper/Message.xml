@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.roy.mapper.MessageMapper">
+
+    <resultMap id="BaseResultMap" type="com.roy.entity.Message">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="sender_id" property="senderId" jdbcType="BIGINT"/>
+        <result column="receiver_id" property="receiverId" jdbcType="BIGINT"/>
+        <result column="role_id" property="roleId" jdbcType="BIGINT"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="read_num" property="read_num" jdbcType="INTEGER"/>
+        <result column="del_flag" property="delFlag" jdbcType="TINYINT"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="sender_username" property="senderUsername" jdbcType="VARCHAR"/>
+        <result column="receiver_username" property="receiverUsername" jdbcType="VARCHAR"/>
+        <result column="realname" property="realname" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        m.id, m.sender_id, m.receiver_id, m.role_id, m.type, m.content,
+        m.status, m.del_flag, m.create_time, m.update_time, 
+        u1.username as sender_username, u2.username as receiver_username,
+        u1.realname
+    </sql>
+    
+    <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM message m
+        LEFT JOIN user u1 ON m.sender_id = u1.id
+        LEFT JOIN user u2 ON m.receiver_id = u2.id
+        WHERE m.id = #{id}
+    </select>
+
+    <update id="updateById" parameterType="com.roy.entity.Message">
+        UPDATE message
+        SET sender_id = #{et.senderId},
+            receiver_id = #{et.receiverId},
+            role_id = #{et.roleId},
+            type = #{et.type},
+            content = #{et.content},
+            status = #{et.status},
+            del_flag = #{et.delFlag},
+            update_time = #{et.updateTime}
+        WHERE id = #{et.id}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        DELETE FROM message
+        WHERE id = #{id}
+    </delete>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM message m
+        LEFT JOIN user u1 ON m.sender_id = u1.id
+        LEFT JOIN user u2 ON m.receiver_id = u2.id
+        <where>
+            <if test="content != null and content != ''">
+                AND content LIKE CONCAT('%', #{content}, '%')
+            </if>
+            <if test="status != null">
+                AND m.status = #{status}
+            </if>
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectListWithPage" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM message m
+        LEFT JOIN user u1 ON m.sender_id = u1.id
+        LEFT JOIN user u2 ON m.receiver_id = u2.id
+        <where>
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+            <if test="content != null and content != ''">
+                AND content LIKE CONCAT('%', #{content}, '%')
+            </if>
+            <if test="status != null">
+                AND m.status = #{status}
+            </if>
+        </where>
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="countMessages" resultType="java.lang.Long">
+        SELECT COUNT(*)
+        FROM message
+        <where>
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+            <if test="content != null and content != ''">
+                AND content LIKE CONCAT('%', #{content}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+    <!--插入新数据-->
+    <insert id="insert" parameterType="com.roy.entity.Message">
+        INSERT INTO message (sender_id, receiver_id, role_id, type, content, status, del_flag, create_time, update_time)
+        VALUES (#{senderId}, #{receiverId}, #{roleId}, #{type}, #{content}, #{status}, #{delFlag}, now(), now())
+    </insert>
+
+    <!-- 查询receiver_id=role_id=null的消息 -->
+    <select id="selectMessagesByReceiverAndRoleNull" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM message m
+        LEFT JOIN user u1 ON m.sender_id = u1.id
+        LEFT JOIN user u2 ON m.receiver_id = u2.id
+        WHERE m.receiver_id IS NULL AND m.role_id IS NULL
+    </select>
+
+    <!-- 查询role_id=2的消息 -->
+    <select id="selectMessagesByRoleId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM message m
+        LEFT JOIN user u1 ON m.sender_id = u1.id
+        LEFT JOIN user u2 ON m.receiver_id = u2.id
+        WHERE m.role_id = #{roleId}
+    </select>
+
+    <select id="searchContents" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM message m
+        LEFT JOIN user u1 ON m.sender_id = u1.id
+        LEFT JOIN user u2 ON m.receiver_id = u2.id
+        WHERE m.content LIKE CONCAT('%', #{content}, '%')
+    </select>
+
+    <select id="selectTMessage" resultMap="BaseResultMap">
+        SELECT m.*, u.realname
+        FROM message m
+                 LEFT JOIN user u ON m.sender_id = u.id
+        WHERE (m.receiver_id IS NULL AND m.role_id IS NULL)
+           OR m.role_id = 3
+           OR m.sender_id = #{currentUserId}
+    </select>
+
+    <select id="selectMessagesByUserId" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM message m
+        LEFT JOIN user u1 ON m.sender_id = u1.id
+        LEFT JOIN user u2 ON m.receiver_id = u2.id
+        WHERE m.receiver_id = #{userId}
+        ORDER BY m.create_time DESC
+    </select>
+
+    <update id="updateStatus" parameterType="com.roy.entity.Message">
+        UPDATE message
+        SET status = 1
+        WHERE id = #{id}
+    </update>
+
+</mapper>

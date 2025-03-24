@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>消息管理 - 管理员工作台</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Favicon -->
+    <link href="/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="/css/style-da.css" rel="stylesheet">
+</head>
+
+<body>
+<div class="container-fluid position-relative bg-white d-flex p-0">
+    <!-- Spinner Start -->
+    <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <!-- Spinner End -->
+
+    <!-- Sidebar Start -->
+    <div class="sidebar pe-4 pb-3">
+        <nav class="navbar bg-light navbar-light">
+            <a href="/admin/dashboard" class="navbar-brand mx-4 mb-3">
+                <h3 class="text-primary">管理员工作台</h3>
+            </a>
+            <div class="d-flex align-items-center ms-4 mb-4">
+                <div class="position-relative">
+                    <img class="rounded-circle" src="/images/user.jpg" alt="" style="width: 40px; height: 40px;">
+                    <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
+                </div>
+                <div class="ms-3">
+                    <h6 class="mb-0" th:text="${#authentication.principal.username}">用户名</h6>
+                    <span>管理员</span><!--此处显示账号类型-->
+                </div>
+            </div>
+            <div class="navbar-nav w-100">
+                <a href="/admin/dashboard" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>工作台</a>
+                <a href="/admin/user-management" class="nav-item nav-link"><i class="fa fa-th me-2"></i>用户管理</a>
+                <a href="/admin/role-management" class="nav-item nav-link"><i class="fa fa-keyboard me-2"></i>角色管理</a>
+                <a href="/admin/project-management" class="nav-item nav-link"><i class="fa fa-book me-2"></i>课题管理</a>
+                <a href="/admin/message-management" class="nav-item nav-link active"><i class="fa fa-envelope me-2"></i>消息管理</a>
+            </div>
+        </nav>
+    </div>
+    <!-- Sidebar End -->
+
+
+    <!-- Content Start -->
+    <div class="content">
+        <!-- Navbar Start -->
+        <nav class="navbar navbar-expand bg-light navbar-light sticky-top px-4 py-0">
+           
+            <a href="#" class="sidebar-toggler flex-shrink-0">
+                <i class="fa fa-bars"></i>
+            </a>
+            <div class="navbar-nav align-items-center ms-auto">
+                
+                <div class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                        <img class="rounded-circle me-lg-2" src="/images/user.jpg" alt="" style="width: 40px; height: 40px;">
+                        <span class="d-none d-lg-inline-flex" th:text="${#authentication.principal.username}">用户名</span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
+                        <a href="/user/userinfo" class="dropdown-item">个人信息</a>
+                        <form th:action="@{/logout}" method="post">
+                            <button type="submit" class="dropdown-item">退出登录</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <!-- Navbar End -->
+
+        <!-- 编辑消息模态框 -->
+        <div class="modal fade" id="editMessageModal" tabindex="-1" aria-labelledby="editMessageModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editMessageModalLabel">编辑消息</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editMessageForm">
+                            <input type="hidden" id="editMessageId">
+                            <div class="mb-3">
+                                <label for="editMessageContent" class="form-label">消息内容</label>
+                                <textarea class="form-control" id="editMessageContent" rows="3" style="resize: none;"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary" onclick="updateMessage()">保存更改</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 新建消息模态框 -->
+        <div class="modal fade" id="newMessageModal" tabindex="-1" aria-labelledby="newMessageModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="newMessageModalLabel">新建消息</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="recipient" class="form-label">接收者</label>
+                                <select class="form-select" id="recipient">
+                                    <option value="ALL">所有用户</option>
+                                    <option value="STUDENT">所有学生</option>
+                                    <option value="TEACHER">所有教师</option>
+                                    <option value="ADMIN">所有管理员</option>
+                                    <option value="CHOOSE">指定接收者</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="messageType" class="form-label">类型</label>
+                                <select class="form-select" id="messageType">
+                                    <option value="0">系统消息</option>
+                                    <option value="1">通知消息</option>
+                                </select>
+                            </div>
+                            <div id="specificRecipient" class="mb-3" style="display: none;">
+                                <div>
+                                    <label for="specificRecipientInput" class="form-label">指定接收者</label>
+                                    <input type="text" class="form-control" id="specificRecipientInput" placeholder="请输入接收者用户名">
+                                </div>
+                                </div>
+                            <div class="mb-3">
+                                <label for="messageContent" class="form-label">消息内容</label>
+                                <textarea class="form-control" id="messageContent" rows="3" style="resize: none;"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                        <button type="button" class="btn btn-primary" onclick="sendMessage()">发送消息</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--在此处下面更新主要内容区-->
+        <div class="container-fluid pt-4 px-4">
+            <div class="bg-light rounded-top p-4">
+                <div class="row">
+                    <div class="col-12">
+                        <button class="btn btn-primary float-end btn-new-message">新建消息</button>
+                        <h4 class="mb-4">消息管理</h4>
+                        
+                        <!-- 消息搜索和过滤 -->
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <input type="text" id="contentSearch" class="form-control" placeholder="搜索消息内容...">
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="statusFilter">
+                                    <option value="">全部状态</option>
+                                    <option value="0">未读</option>
+                                    <option value="1">已读</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="typeFilter">
+                                    <option value="">全部类型</option>
+                                    <option value="0">系统消息</option>
+                                    <option value="1">通知消息</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-primary w-100" onclick="searchMessages()">搜索</button>
+                            </div>
+                        </div>
+
+                        <!-- 消息列表 -->
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">ID</th>
+                                        <th scope="col">发件人</th>
+                                        <th scope="col">收件人</th>
+                                        <th scope="col">内容</th>
+                                        <th scope="col">类型</th>
+                                        <th scope="col">状态</th>
+                                        <th scope="col">发布时间</th>
+                                        <th scope="col">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>系统管理员</td>
+                                        <td>管理员</td>
+                                        <td>系统升级通知</td>
+                                        <td><span class="badge bg-primary">系统消息</span></td>
+                                        <td><span class="badge bg-success">已读</span></td>
+                                        <td>2025-02-08 10:00</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary">修改</button>
+                                            <button class="btn btn-sm btn-danger">删除</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>张三</td>
+                                        <td>管理员</td>
+                                        <td>关于课题选择的咨询</td>
+                                        <td><span class="badge bg-warning">通知消息</span></td>
+                                        <td><span class="badge bg-secondary">未读</span></td>
+                                        <td>2025-02-08 09:30</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary">修改</button>
+                                            <button class="btn btn-sm btn-danger">删除</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- 分页 -->
+                        <nav class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1">上一页</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">下一页</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Start -->
+        <div class="container-fluid pt-4 px-4">
+            <div class="bg-light rounded-top p-4">
+                <div class="row">
+                    <div class="col-12 col-sm-6 text-center text-sm-start">
+                        &copy; <a href="#">毕业设计学生选题系统</a>, All Right Reserved.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Footer End -->
+    </div>
+    <!-- Content End -->
+
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+</div>
+
+<!-- JavaScript Libraries -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/lib/chart/chart.min.js"></script>
+<script src="/lib/easing/easing.min.js"></script>
+<script src="/lib/waypoints/waypoints.min.js"></script>
+<script src="/lib/owlcarousel/owl.carousel.min.js"></script>
+<script src="/lib/tempusdominus/js/moment.min.js"></script>
+<script src="/lib/tempusdominus/js/moment-timezone.min.js"></script>
+<script src="/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+
+<!-- Template Javascript -->
+<script src="/js/main.js"></script>
+
+<script>
+    // 绑定新建消息按钮点击事件
+    document.querySelector('.btn-new-message').addEventListener('click', function() {
+        new bootstrap.Modal(document.getElementById('newMessageModal')).show();
+    });
+
+    // 监听接收者选择变化
+    document.getElementById('recipient').addEventListener('change', function() {
+        const specificRecipientDiv = document.getElementById('specificRecipient');
+        if (this.value === 'CHOOSE') {
+            specificRecipientDiv.style.display = 'block';
+        } else {
+            specificRecipientDiv.style.display = 'none';
+        }
+    });
+
+    function searchMessages() {
+        const type = document.getElementById('typeFilter').value;
+        const content = document.getElementById('contentSearch').value;
+        const status = document.getElementById('statusFilter').value;
+
+        fetch(`/messages/search?type=${type}&content=${content}&status=${status}`)
+            .then(response => response.json())
+            .then(messages => {
+                const tbody = document.querySelector('table tbody');
+                tbody.innerHTML = '';
+
+                messages.forEach(msg => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${msg.id}</td>
+                        <td>${msg.senderUsername}</td>
+                                        <td>
+                                            ${msg.receiverId ? msg.receiverUsername : 
+                                                msg.roleId === 1 ? '所有管理员' :
+                                                msg.roleId === 2 ? '所有学生' :
+                                                msg.roleId === 3 ? '所有教师' : '所有用户'}
+                                        </td>
+                        <td>${msg.content.substring(0, 12)}</td>
+                        <td>
+                            <span class="badge ${msg.type === 0 ? 'bg-primary' : 'bg-warning'}">
+                                ${msg.type === 0 ? '系统消息' : '通知消息'}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge ${msg.status === 0 ? 'bg-secondary' : 'bg-success'}">
+                                ${msg.status === 0 ? '已读' : '未读'}
+                            </span>
+                        </td>
+                        <td>${new Date(msg.createTime).toLocaleString()}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="viewMessage(${msg.id})">修改</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteMessage(${msg.id})">删除</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function viewMessage(id) {
+        // 实现编辑消息详情功能
+    }
+
+    function deleteMessage(id) {
+        // 实现删除消息功能
+    }
+
+    let currentPage = 1;
+    const pageSize = 10;
+
+    function updatePagination(total) {
+        const pagination = document.querySelector('.pagination');
+        pagination.innerHTML = '';
+
+        // 上一页
+        const prevLi = document.createElement('li');
+        prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+        prevLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage - 1})">上一页</a>`;
+        pagination.appendChild(prevLi);
+
+        // 页码
+        const totalPages = Math.ceil(total / pageSize);
+        for (let i = 1; i <= totalPages; i++) {
+            const li = document.createElement('li');
+            li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+            li.innerHTML = `<a class="page-link" href="#" onclick="changePage(${i})">${i}</a>`;
+            pagination.appendChild(li);
+        }
+
+        // 下一页
+        const nextLi = document.createElement('li');
+        nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+        nextLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage + 1})">下一页</a>`;
+        pagination.appendChild(nextLi);
+    }
+
+    function changePage(page) {
+        currentPage = page;
+        searchMessages();
+    }
+
+    function searchMessages() {
+        const type = document.getElementById('typeFilter').value;
+        const content = document.getElementById('contentSearch').value;
+        const status = document.getElementById('statusFilter').value;
+        const offset = (currentPage - 1) * pageSize;
+
+        fetch(`/messages/search/page?type=${type}&content=${content}&status=${status}&offset=${offset}&pageSize=${pageSize}`)
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.querySelector('table tbody');
+                tbody.innerHTML = '';
+
+                data.messages.forEach(msg => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${msg.id}</td>
+                        <td>${msg.senderUsername}</td>
+                        <td>
+                            ${msg.receiverId ? msg.receiverUsername : 
+                                msg.roleId === 1 ? '所有管理员' :
+                                msg.roleId === 2 ? '所有学生' :
+                                msg.roleId === 3 ? '所有教师' : '所有用户'}
+                        </td>
+                        <td>${msg.content.substring(0, 12)}</td>
+                        <td>
+                            <span class="badge ${msg.type === 0 ? 'bg-primary' : 'bg-warning'}">
+                                ${msg.type === 0 ? '系统消息' : '通知消息'}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge ${msg.status === 0 ? 'bg-secondary' : 'bg-success'}">
+                                ${msg.status === 0 ? '未读' : '已读'}
+                            </span>
+                        </td>
+                        <td>${new Date(msg.createTime).toLocaleString()}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary" onclick="viewMessage(${msg.id})">编辑</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteMessage(${msg.id})">删除</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                updatePagination(data.total);
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function viewMessage(id) {
+        fetch(`/messages/${id}`)
+            .then(response => response.json())
+            .then(message => {
+                document.getElementById('editMessageId').value = message.id;
+                const contentTextarea = document.getElementById('editMessageContent');
+                contentTextarea.value = message.content || '';
+                new bootstrap.Modal(document.getElementById('editMessageModal')).show();
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function updateMessage() {
+        const id = document.getElementById('editMessageId').value;
+        const content = document.getElementById('editMessageContent').value;
+
+        if (!content || content.trim().length === 0) {
+            alert('消息内容不能为空');
+            return;
+        }
+
+        const updatedMessage = {
+            id: parseInt(id),
+            content: content.trim(),
+            updateTime: new Date()
+        };
+
+        fetch(`/messages/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedMessage)
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('消息更新成功');
+                $('#editMessageModal').modal('hide');
+                searchMessages();
+            } else {
+                return response.json().then(error => {
+                    throw new Error(error.message || '消息更新失败');
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('消息更新失败: ' + error.message);
+        });
+    }
+
+    function deleteMessage(id) {
+        if (confirm('确定要删除这条消息吗？')) {
+            fetch(`/messages/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => {
+                if (response.ok) {
+                    searchMessages();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    }
+
+    // 页面加载时自动搜索
+    document.addEventListener('DOMContentLoaded', searchMessages);
+
+    function sendMessage() {
+        const recipientType = document.getElementById('recipient').value;
+        const receiverUsername = recipientType === 'CHOOSE' 
+            ? document.getElementById('specificRecipientInput').value 
+            : null;
+        const content = document.getElementById('messageContent').value;
+        const messageType = parseInt(document.getElementById('messageType').value);
+
+        // 验证消息内容
+        if (!content || content.trim().length === 0) {
+            alert('消息内容不能为空');
+            return;
+        }
+
+        // 如果选择指定用户，验证用户名
+        if (recipientType === 'CHOOSE' && (!receiverUsername || receiverUsername.trim().length === 0)) {
+            alert('请指定接收者用户名');
+            return;
+        }
+
+        const message = {
+            recipientType: recipientType,
+            receiverUsername: receiverUsername,
+            content: content.trim(),
+            type: messageType
+        };
+
+        fetch('/messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(message)
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('消息发送成功');
+                // 清空表单
+                document.getElementById('messageContent').value = '';
+                document.getElementById('specificRecipientInput').value = '';
+                // 隐藏模态框
+                $('#newMessageModal').modal('hide');
+                // 刷新消息列表
+                searchMessages();
+            } else {
+                return response.json().then(error => {
+                    throw new Error(error.message || '消息发送失败');
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('消息发送失败: ' + error.message);
+        });
+    }
+</script>
+</body>
+
+</html>

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>消息管理 - 教师工作台</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Favicon -->
+    <link href="/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="/css/style-da.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container-fluid position-relative bg-white d-flex p-0">
+        <!-- Spinner Start -->
+        <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <!-- Spinner End -->
+
+        <!-- Sidebar Start -->
+        <div class="sidebar pe-4 pb-3">
+            <nav class="navbar bg-light navbar-light">
+                <a href="/teacher/dashboard" class="navbar-brand mx-4 mb-3">
+                    <h3 class="text-primary">工作台</h3>
+                </a>
+                <div class="d-flex align-items-center ms-4 mb-4">
+                    <div class="position-relative">
+                        <img class="rounded-circle" src="/images/user.jpg" alt="" style="width: 40px; height: 40px;">
+                        <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="mb-0" th:text="${#authentication.principal.username}">用户名</h6>
+                        <span>教师</span>
+                    </div>
+                </div>
+                <div class="navbar-nav w-100">
+                    <a href="/teacher/dashboard" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>工作台</a>
+                    <a href="/teacher/project-management" class="nav-item nav-link"><i class="fa fa-book me-2"></i>课题管理</a>
+                    <a href="/teacher/process-management" class="nav-item nav-link"><i class="fa fa-tasks me-2"></i>进程管理</a>
+                    <a href="/teacher/message-management" class="nav-item nav-link active"><i class="fa fa-envelope me-2"></i>消息管理</a>
+                </div>
+            </nav>
+        </div>
+        <!-- Sidebar End -->
+
+        <!-- Content Start -->
+        <div class="content">
+            <!-- Navbar Start -->
+            <nav class="navbar navbar-expand bg-light navbar-light sticky-top px-4 py-0">
+                <a href="#" class="sidebar-toggler flex-shrink-0">
+                    <i class="fa fa-bars"></i>
+                </a>
+                
+                <div class="navbar-nav align-items-center ms-auto">
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <img class="rounded-circle me-lg-2" src="/images/user.jpg" alt="" style="width: 40px; height: 40px;">
+                            <span class="d-none d-lg-inline-flex" th:text="${#authentication.principal.username}">用户名</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
+                            <a href="/user/userinfo" class="dropdown-item">个人信息</a>
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="dropdown-item">退出登录</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <!-- Navbar End -->
+
+            <!-- Main Content Start -->
+            <div class="container-fluid pt-4 px-4">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="bg-light rounded h-100 p-4">
+                            <h4 class="mb-4">消息管理</h4>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">ID</th>
+                                            <th scope="col">发件人</th>
+                                            <th scope="col">收件人</th>
+                                            <th scope="col">内容</th>
+                                            <th scope="col">类型</th>
+                                            <th scope="col">状态</th>
+                                            <th scope="col">发布时间</th>
+                                            <th scope="col">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th scope="row">1</th>
+                                            <td>学生A</td>
+                                            <td>学生b</td>
+                                            <td>关于课题的疑问</td>
+                                            <td>内心</td>
+                                            <td>状态</td>
+                                            <td>2025-02-08 10:30</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-primary">查看</button>
+                                                <button type="button" class="btn btn-sm btn-danger" onclick="deleteMessage($(message.id))">删除</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Main Content End -->
+
+            <!-- Footer Start -->
+            <div class="container-fluid pt-4 px-4">
+                <div class="bg-light rounded-top p-4">
+                    <div class="row">
+                        <div class="col-12 col-sm-6 text-center text-sm-start">
+                            &copy; <a href="#">毕业设计学生选题系统</a>, All Right Reserved. 
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Footer End -->
+        </div>
+        <!-- Content End -->
+
+        <!-- Back to Top -->
+        <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+    </div>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/lib/chart/chart.min.js"></script>
+    <script src="/lib/easing/easing.min.js"></script>
+    <script src="/lib/waypoints/waypoints.min.js"></script>
+    <script src="/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="/lib/tempusdominus/js/moment.min.js"></script>
+    <script src="/lib/tempusdominus/js/moment-timezone.min.js"></script>
+    <script src="/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+
+    <!-- 存储当前用户名 -->
+    <input type="hidden" id="currentUsername" th:value="${#authentication.principal.username}" />
+
+    <!-- Template Javascript -->
+    <script src="/js/main.js"></script>
+    <script>
+        // 获取当前用户名
+        const currentUsername = document.getElementById('currentUsername').value;
+        
+        // 初始化页面时加载消息数据
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMessages();
+        });
+
+        // 删除消息
+        async function deleteMessage(messageId) {
+            if (!confirm('确定要删除该消息吗？')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/messages/${messageId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('删除失败');
+                }
+
+                // 重新加载消息列表
+                await loadMessages();
+                alert('删除成功');
+            } catch (error) {
+                console.error('删除消息失败:', error);
+                alert('删除消息失败，请稍后重试');
+            }
+        }
+
+        // 加载消息数据
+        async function loadMessages() {
+            try {
+                // 显示加载状态
+                const tableBody = document.querySelector('table tbody');
+                tableBody.innerHTML = `<tr><td colspan="8" class="text-center">加载中...</td></tr>`;
+
+                // 调用API获取数据
+                // 获取系统消息
+                const systemResponse = await fetch('/messages/selectTMessage', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                // 获取用户消息
+                const userResponse = await fetch('/messages/user', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!systemResponse.ok || !userResponse.ok) {
+                    throw new Error('网络请求失败');
+                }
+
+                const systemMessages = await systemResponse.json();
+                const userMessages = await userResponse.json();
+                const data = [...systemMessages, ...userMessages];
+                
+                console.log('Message Data:', data);
+                renderTable(data);
+            } catch (error) {
+                console.error('加载消息失败:', error);
+                const tableBody = document.querySelector('table tbody');
+                tableBody.innerHTML = `<tr><td colspan="8" class="text-center text-danger">加载失败，请稍后重试</td></tr>`;
+            }
+        }
+
+        // 渲染表格数据
+        function renderTable(messages) {
+            const tableBody = document.querySelector('table tbody');
+            tableBody.innerHTML = '';
+
+            messages.forEach(message => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <th scope="row">${message.id}</th>
+                    <td>${message.realname}</td>
+                    <td>${message.receiverId === null ? (message.roleId === null ? '所有用户' : message.roleId === 1 ? '所有管理员' : message.roleId === 2 ? '所有学生' : '所有教师') : currentUsername}</td>
+                    <td>${message.content.substring(0, 15)}</td>
+                    <td><span class="badge ${message.type === 1 ? 'bg-warning' : 'bg-primary'}">${message.type === 1 ? '通知消息' : '系统消息'}</span></td>
+                    <td><span class="badge ${message.status === 1 ? 'bg-success' : 'bg-secondary'}">${message.status === 1 ? '已读' : '未读'}</span></td>
+                    <td>${new Date(message.createTime).toLocaleString()}</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-primary" onclick="showMessageDetail(${message.id})">查看</button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="deleteMessage(${message.id})">删除</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // 显示消息详情模态框
+        async function showMessageDetail(messageId) {
+            try {
+                // 先更新消息状态为已读
+                await fetch(`/messages/updateStatus/${messageId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                // 获取消息详情
+                const response = await fetch(`/messages/${messageId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('网络请求失败');
+                }
+
+                const message = await response.json();
+                
+                // 填充模态框内容
+                document.getElementById('messageDetailSender').textContent = message.realname;
+                document.getElementById('messageDetailReceiver').textContent = message.receiverId === null ? 
+                    (message.roleId === null ? '所有用户' : 
+                    message.roleId === 1 ? '所有管理员' : 
+                    message.roleId === 2 ? '所有学生' : 
+                    '所有教师') : message.receiver;
+                document.getElementById('messageDetailContent').textContent = message.content;
+                document.getElementById('messageDetailType').textContent = message.type === 1 ? '通知消息' : '系统消息';
+                document.getElementById('messageDetailStatus').textContent = message.status === 1 ? '已读' : '未读';
+                document.getElementById('messageDetailTime').textContent = new Date(message.createTime).toLocaleString();
+                
+                // 显示模态框
+                const messageModal = new bootstrap.Modal(document.getElementById('messageDetailModal'));
+                messageModal.show();
+                
+                // 重新加载消息列表以更新状态显示
+                await loadMessages();
+            } catch (error) {
+                console.error('获取消息详情失败:', error);
+                alert('获取消息详情失败，请稍后重试');
+            }
+        }
+    </script>
+
+    <!-- Message Detail Modal -->
+    <div class="modal fade" id="messageDetailModal" tabindex="-1" aria-labelledby="messageDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="messageDetailModalLabel">消息详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">发件人:</label>
+                        <p id="messageDetailSender" class="form-control-plaintext"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">收件人:</label>
+                        <p id="messageDetailReceiver" class="form-control-plaintext"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">内容:</label>
+                        <p id="messageDetailContent" class="form-control-plaintext"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">类型:</label>
+                        <p id="messageDetailType" class="form-control-plaintext"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">状态:</label>
+                        <p id="messageDetailStatus" class="form-control-plaintext"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">发布时间:</label>
+                        <p id="messageDetailTime" class="form-control-plaintext"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

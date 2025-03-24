@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.roy.mapper.TopicMapper">
+
+    <select id="topicsSearchS" resultType="com.roy.entity.Topic">
+        SELECT 
+            t.id,
+            t.title,
+            t.description,
+            t.requirements,
+            t.max_students AS maxStudents,
+            t.status,
+            t.create_time AS createTime,
+            u.username AS teacherName
+        FROM topic t
+        LEFT JOIN user u ON t.teacher_id = u.id
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (t.title LIKE CONCAT('%', #{keyword}, '%')
+                OR t.description LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="statuses != null">
+                AND t.status IN
+                <foreach collection="statuses" item="status" open="(" separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
+        </where>
+    </select>
+    <select id="topicSelectedSearch" resultType="com.roy.entity.Topic">
+        SELECT
+            t.id,
+            t.title,
+            t.description,
+            t.requirements,
+            t.max_students AS maxStudents,
+            t.status,
+            t.create_time AS createTime,
+            t.update_time AS updateTime,
+            t.teacher_id AS teacherId,
+            u.username AS teacherName
+        FROM topic t
+        JOIN student_topic st ON t.id = st.topic_id
+        JOIN user u ON t.teacher_id = u.id
+        WHERE st.student_id = #{studentId}
+    </select>
+    <select id="selectTList" resultType="com.roy.entity.Topic">
+        SELECT
+            id,
+            title,
+            status,
+            description,
+            max_students AS maxStudents,
+            teacher_id AS teacherId,
+            create_time AS createdAt,
+            update_time AS updatedAt,
+            requirements
+        FROM topic
+        WHERE teacher_id = #{teacherId}
+    </select>
+
+    <select id="selectList" resultType="com.roy.entity.Topic">
+        SELECT
+            id,
+            title,
+            description,
+            status,
+            max_students AS maxStudents,
+            teacher_id AS teacherId,
+            create_time AS createdAt,
+            update_time AS updatedAt,
+            requirements
+        FROM topic
+    </select>
+
+    <insert id="insert" parameterType="com.roy.entity.Topic">
+        INSERT INTO topic (
+            title,
+            description,
+            teacher_id,
+            create_time,
+            update_time,
+            requirements,
+            max_students
+        ) VALUES (
+            #{title},
+            #{description},
+            #{teacherId},
+            NOW(),
+            NOW(),
+            #{requirements},
+            #{maxStudents}
+        )
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        DELETE FROM topic WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByTeacherId" parameterType="java.lang.Long">
+        DELETE FROM topic WHERE teacher_id = #{teacherId}
+    </delete>
+
+    <select id="selectById" resultType="com.roy.entity.Topic">
+        SELECT 
+            id,
+            title,
+            status,
+            description,
+            teacher_id AS teacherId,
+            create_time AS createdAt,
+            update_time AS updatedAt,
+            requirements,
+            max_students AS maxStudents
+        FROM topic
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectDetailsById" resultType="com.roy.entity.Topic">
+        SELECT 
+            t.id,
+            t.title,
+            t.status,
+            t.description,
+            t.teacher_id AS teacherId,
+            t.create_time AS createdAt,
+            t.update_time AS updatedAt,
+            t.requirements,
+            t.max_students AS maxStudents,
+            u.username AS teacherName
+        FROM topic t
+        LEFT JOIN user u ON t.teacher_id = u.id
+        WHERE t.id = #{id}
+    </select>
+
+
+    <update id="updateById" parameterType="com.roy.entity.Topic">
+        UPDATE topic
+        SET
+            title = #{topic.title},
+            description = #{topic.description},
+            teacher_id = #{topic.teacherId},
+            update_time = NOW(),
+            requirements = #{topic.requirements},
+            max_students = #{topic.maxStudents}
+        WHERE id = #{topic.id}
+    </update>
+
+    <update id="updateStatusById" parameterType="com.roy.entity.Topic">
+        UPDATE topic
+        SET
+            status = #{topic.status}
+        WHERE id = #{topic.id}
+    </update>
+
+    <update id="updateTopicStatusToFull" parameterType="com.roy.entity.Topic">
+        UPDATE topic
+        SET status = 3
+        WHERE id = #{topicId}
+    </update>
+
+    <select id="countStudentSubmissions" resultType="int">
+        SELECT COUNT(*) 
+        FROM student_topic
+        WHERE status = 3
+    </select>
+
+    <select id="countTeacherSubmissions" resultType="int">
+        SELECT COUNT(*)
+        FROM topic
+        WHERE status IN (2, 3)
+    </select>
+
+</mapper>
