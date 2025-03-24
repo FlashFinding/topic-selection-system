@@ -71,7 +71,7 @@
 
 1. 克隆仓库
    ```bash
-   git clone https://github.com/roy/topic-selection-system.git
+   git clone https://github.com/FlashFinding/topic-selection-system.git
    ```
 
 2. 创建数据库
@@ -92,16 +92,5 @@
    - 教师：http://localhost:8080/teacher
    - 学生：http://localhost:8080/student
 
-## API文档
-
-### 用户相关
-- **POST /api/user/register** 用户注册
-- **POST /api/user/login** 用户登录
-- **GET /api/user/info** 获取用户信息
-
-### 选题相关
-- **GET /api/topic/list** 获取选题列表
-- **POST /api/topic/apply** 提交选题申请
-- **PUT /api/topic/approve** 审批选题
 
 
